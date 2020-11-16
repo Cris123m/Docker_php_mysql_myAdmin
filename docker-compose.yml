@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  db:
+    image: mysql:8
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/sql-scripts/:/docker-entrypoint-initdb.d/
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: prueba
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  phpadmin:
+    image: "phpmyadmin/phpmyadmin"
+    ports:
+      - "8080:80"
+    links:
+      - db
+  webservice:
+    build:
+      dockerfile: ./web/Dockerfile
+      context: .
+    ports:
+      - "3000:80"
+    links:
+      - db
+    volumes:
+      - ./web:/var/www/html
+volumes:
+  db_data: {}
